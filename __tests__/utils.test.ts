@@ -191,7 +191,7 @@ describe('getPRDescription()', () => {
 
     expect(shouldUpdatePRDescription(description)).toBeFalsy();
     expect(description).toContain(issue.key);
-    expect(description).toContain(issue.estimate);
+    expect(description).toContain(issue.estimate.toString());
     expect(description).toContain(issue.status);
     expect(description).toContain(issue.labels[0].name);
   });
@@ -219,8 +219,8 @@ describe('getNoIdComment()', () => {
 
 describe('getHugePrComment()', () => {
   it('should return the comment content with additions and threshold', () => {
-    expect(getHugePrComment(1000, 800)).toContain(1000);
-    expect(getHugePrComment(1000, 800)).toContain(800);
+    expect(getHugePrComment(1000, 800)).toContain('1000');
+    expect(getHugePrComment(1000, 800)).toContain('800');
   });
 });
 
