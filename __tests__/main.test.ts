@@ -125,6 +125,7 @@ describe('run() - JIRA key resolution', () => {
     await flushPromises();
 
     expect(mockGetTicketDetails).toHaveBeenCalledWith('DAISY-1');
+    expect(mockGetTicketDetails).not.toHaveBeenCalledWith('DAISY-999');
     expect(mockGetTicketDetails).not.toHaveBeenCalledWith('DAISY-998');
     expect(mockGetTicketDetails).not.toHaveBeenCalledWith('DAISY-997');
   });
