@@ -6,6 +6,11 @@ import { IssuesAddLabelsParams, PullsUpdateParams, IssuesCreateCommentParams } f
 import { MARKER_REGEX, BOT_BRANCH_PATTERNS, DEFAULT_BRANCH_PATTERNS, HIDDEN_MARKER } from './constants';
 import { JIRA, JIRADetails, JIRAClient } from './types';
 
+type OctokitClient = ReturnType<typeof github.getOctokit>;
+type IssuesAddLabelsParams = RestEndpointMethodTypes['issues']['addLabels']['parameters'];
+type PullsUpdateParams = RestEndpointMethodTypes['pulls']['update']['parameters'];
+type IssuesCreateCommentParams = RestEndpointMethodTypes['issues']['createComment']['parameters'];
+
 export const isBlank = (input: string): boolean => input.trim().length === 0;
 export const isNotBlank = (input: string): boolean => !isBlank(input);
 
@@ -102,31 +107,31 @@ export const getJIRAClient = (baseURL: string, token: string): JIRAClient => {
 };
 
 /** Add the specified label to the PR. */
-export const addLabels = async (client: github.GitHub, labelData: IssuesAddLabelsParams): Promise<void> => {
+export const addLabels = async (client: OctokitClient, labelData: IssuesAddLabelsParams): Promise<void> => {
   try {
-    await client.issues.addLabels(labelData);
+    await client.rest.issues.addLabels(labelData);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed((error as Error).message);
     process.exit(1);
   }
 };
 
 /** Update a PR details. */
-export const updatePrDetails = async (client: github.GitHub, prData: PullsUpdateParams): Promise<void> => {
+export const updatePrDetails = async (client: OctokitClient, prData: PullsUpdateParams): Promise<void> => {
   try {
-    await client.pulls.update(prData);
+    await client.rest.pulls.update(prData);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed((error as Error).message);
     process.exit(1);
   }
 };
 
 /** Add a comment to a PR. */
-export const addComment = async (client: github.GitHub, comment: IssuesCreateCommentParams): Promise<void> => {
+export const addComment = async (client: OctokitClient, comment: IssuesCreateCommentParams): Promise<void> => {
   try {
-    await client.issues.createComment(comment);
+    await client.rest.issues.createComment(comment);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed((error as Error).message);
   }
 };
 

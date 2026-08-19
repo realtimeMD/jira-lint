@@ -1,6 +1,9 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { PullsUpdateParams, IssuesCreateCommentParams } from '@octokit/rest';
+import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
+
+type IssuesCreateCommentParams = RestEndpointMethodTypes['issues']['createComment']['parameters'];
+type PullsUpdateParams = RestEndpointMethodTypes['pulls']['update']['parameters'];
 
 import {
   addComment,
@@ -96,7 +99,7 @@ async function run(): Promise<void> {
     };
 
     // github client with given token
-    const client: github.GitHub = new github.GitHub(GITHUB_TOKEN);
+    const client = github.getOctokit(GITHUB_TOKEN);
 
     if (!headBranch && !baseBranch) {
       const commentBody = 'jira-lint is unable to determine the head and base branch';
@@ -201,7 +204,7 @@ async function run(): Promise<void> {
     }
   } catch (error) {
     console.log({ error });
-    core.setFailed(error.message);
+    core.setFailed((error as Error).message);
     process.exit(1);
   }
 }
