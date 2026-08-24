@@ -35,7 +35,7 @@ const getInputs = (): JIRALintActionInputs => {
   const PR_THRESHOLD = parseInt(core.getInput('pr-threshold', { required: false }), 10);
   const VALIDATE_ISSUE_STATUS: boolean = core.getInput('validate_issue_status', { required: false }) === 'true';
   const ALLOWED_ISSUE_STATUSES: string = core.getInput('allowed_issue_statuses');
-  const ISSUE_KEY_PREFIX: string = core.getInput('issue-key-prefix', { required: true });
+  const ISSUE_KEY_PREFIX: string = core.getInput('issue-key-prefix', { required: false });
 
   return {
     JIRA_TOKEN,

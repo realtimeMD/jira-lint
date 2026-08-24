@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import similarity from 'string-similarity';
-import { IssuesAddLabelsParams, PullsUpdateParams, IssuesCreateCommentParams } from '@octokit/rest';
+import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { MARKER_REGEX, BOT_BRANCH_PATTERNS, DEFAULT_BRANCH_PATTERNS, HIDDEN_MARKER } from './constants';
 import { JIRA, JIRADetails, JIRAClient } from './types';
 
@@ -17,9 +17,15 @@ export const isNotBlank = (input: string): boolean => !isBlank(input);
 /** Reverse a string. */
 export const reverseString = (input: string): string => input.split('').reverse().join('');
 
+/** Escape regex metacharacters so a string can be safely embedded in a RegExp. */
+const escapeRegExp = (input: string): string => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /** Extract JIRA issue keys from a string. */
-export const getJIRAIssueKeys = (input: string, issueKeyPrefix: string): string[] => {
-  const JIRA_REGEX_MATCHER = new RegExp(`\\d+-${reverseString(issueKeyPrefix)}`, 'gi');
+export const getJIRAIssueKeys = (input: string, issueKeyPrefix = ''): string[] => {
+  // Without a configured prefix, fall back to matching any alphanumeric project key.
+  const JIRA_REGEX_MATCHER = isNotBlank(issueKeyPrefix)
+    ? new RegExp(`\\d+-${escapeRegExp(reverseString(issueKeyPrefix))}`, 'gi')
+    : /\d+-[A-Z0-9]{1,10}/gi;
   const matches = reverseString(input).toUpperCase().match(JIRA_REGEX_MATCHER);
   if (matches?.length) {
     return matches.map(reverseString).reverse();
