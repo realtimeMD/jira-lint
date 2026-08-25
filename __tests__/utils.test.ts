@@ -123,6 +123,14 @@ describe('getJIRAIssueKeys()', () => {
     expect(getJIRAIssueKeys('feature/missingKey')).toEqual([]);
     expect(getJIRAIssueKeys('')).toEqual([]);
   });
+
+  it('only matches keys with the configured issue key prefix', () => {
+    expect(getJIRAIssueKeys('DAISY-123', 'DAISY')).toEqual(['DAISY-123']);
+    expect(getJIRAIssueKeys('OTHER-45 DAISY-77', 'DAISY')).toEqual(['DAISY-77']);
+    expect(getJIRAIssueKeys('foo-DAISY-999-bar', 'DAISY')).toEqual(['DAISY-999']);
+    expect(getJIRAIssueKeys('DAISY-123 DAISY-456', 'DAISY')).toEqual(['DAISY-123', 'DAISY-456']);
+    expect(getJIRAIssueKeys('OTHER-45', 'DAISY')).toEqual([]);
+  });
 });
 
 describe('shouldUpdatePRDescription()', () => {
