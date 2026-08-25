@@ -33,9 +33,13 @@ inputs:
       Requires validate_issue_status to be set to true.
     required: false
     default: "In Progress"
+  issue-key-prefix:
+    description: 'A project key prefix (e.g. "DAISY") to restrict which JIRA issue keys are matched. If omitted, any alphanumeric project key is matched.'
+    required: false
+    default: ''
 
 runs:
-  using: 'node12'
+  using: 'node20'
   main: 'lib/index.js'
 branding:
   icon: 'check-square'

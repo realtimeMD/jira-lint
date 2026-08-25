@@ -3,13 +3,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import similarity from 'string-similarity';
 import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
-import {
-  MARKER_REGEX,
-  BOT_BRANCH_PATTERNS,
-  DEFAULT_BRANCH_PATTERNS,
-  JIRA_REGEX_MATCHER,
-  HIDDEN_MARKER,
-} from './constants';
+import { MARKER_REGEX, BOT_BRANCH_PATTERNS, DEFAULT_BRANCH_PATTERNS, HIDDEN_MARKER } from './constants';
 import { JIRA, JIRADetails, JIRAClient } from './types';
 
 type OctokitClient = ReturnType<typeof github.getOctokit>;
@@ -23,8 +17,15 @@ export const isNotBlank = (input: string): boolean => !isBlank(input);
 /** Reverse a string. */
 export const reverseString = (input: string): string => input.split('').reverse().join('');
 
+/** Escape regex metacharacters so a string can be safely embedded in a RegExp. */
+const escapeRegExp = (input: string): string => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /** Extract JIRA issue keys from a string. */
-export const getJIRAIssueKeys = (input: string): string[] => {
+export const getJIRAIssueKeys = (input: string, issueKeyPrefix = ''): string[] => {
+  // Without a configured prefix, fall back to matching any alphanumeric project key.
+  const JIRA_REGEX_MATCHER = isNotBlank(issueKeyPrefix)
+    ? new RegExp(`\\d+-${escapeRegExp(reverseString(issueKeyPrefix))}`, 'gi')
+    : /\d+-[A-Z0-9]{1,10}/gi;
   const matches = reverseString(input).toUpperCase().match(JIRA_REGEX_MATCHER);
   if (matches?.length) {
     return matches.map(reverseString).reverse();
@@ -324,9 +325,11 @@ export const getHugePrComment = (
   `;
 
 /** Get the comment body for pr with no JIRA id in the branch name. */
-export const getNoIdComment = (branch: string): string => {
-  return `<p> A JIRA Issue ID is missing from your branch name! 🦄</p>
+export const getNoIdComment = (branch: string, title: string, prBody: string): string => {
+  return `<p> A JIRA Issue ID is missing from your branch name, PR title and PR description! 🦄</p>
 <p>Your branch: ${branch}</p>
+<p>Your PR title: ${title}</p>
+<p>Your PR description: ${prBody}</p>
 <p>If this is your first time contributing to this repository - welcome!</p>
 <hr />
 <p>Please refer to <a href="https://github.com/cleartax/jira-lint">jira-lint</a> to get started.

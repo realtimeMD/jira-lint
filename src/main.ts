@@ -35,6 +35,7 @@ const getInputs = (): JIRALintActionInputs => {
   const PR_THRESHOLD = parseInt(core.getInput('pr-threshold', { required: false }), 10);
   const VALIDATE_ISSUE_STATUS: boolean = core.getInput('validate_issue_status', { required: false }) === 'true';
   const ALLOWED_ISSUE_STATUSES: string = core.getInput('allowed_issue_statuses');
+  const ISSUE_KEY_PREFIX: string = core.getInput('issue-key-prefix', { required: false });
 
   return {
     JIRA_TOKEN,
@@ -45,6 +46,7 @@ const getInputs = (): JIRALintActionInputs => {
     JIRA_BASE_URL: JIRA_BASE_URL.endsWith('/') ? JIRA_BASE_URL.replace(/\/$/, '') : JIRA_BASE_URL,
     VALIDATE_ISSUE_STATUS,
     ALLOWED_ISSUE_STATUSES,
+    ISSUE_KEY_PREFIX,
   };
 };
 
@@ -59,6 +61,7 @@ async function run(): Promise<void> {
       PR_THRESHOLD,
       VALIDATE_ISSUE_STATUS,
       ALLOWED_ISSUE_STATUSES,
+      ISSUE_KEY_PREFIX,
     } = getInputs();
 
     const defaultAdditionsCount = 800;
@@ -117,11 +120,11 @@ async function run(): Promise<void> {
       process.exit(0);
     }
 
-    const issueKeys = getJIRAIssueKeys(headBranch);
+    const issueKeys = getJIRAIssueKeys(`${headBranch} ${title} ${prBody}`, ISSUE_KEY_PREFIX);
     if (!issueKeys.length) {
       const comment: IssuesCreateCommentParams = {
         ...commonPayload,
-        body: getNoIdComment(headBranch),
+        body: getNoIdComment(headBranch, title, prBody),
       };
       await addComment(client, comment);
 
@@ -192,7 +195,7 @@ async function run(): Promise<void> {
     } else {
       const comment: IssuesCreateCommentParams = {
         ...commonPayload,
-        body: getNoIdComment(headBranch),
+        body: getNoIdComment(headBranch, title, prBody),
       };
       await addComment(client, comment);
 
