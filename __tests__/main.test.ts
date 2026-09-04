@@ -141,6 +141,27 @@ describe('run() - JIRA key resolution', () => {
     expect(mockGetTicketDetails).not.toHaveBeenCalledWith('OTHER-999');
   });
 
+  it('prefers head branch keys over PR body keys when title has no key', async () => {
+    await runMain({
+      title: 'Generic title',
+      head: 'feature/DAISY-10-implement-feature',
+      body: 'Also references DAISY-20',
+    });
+
+    expect(mockGetTicketDetails).toHaveBeenCalledWith('DAISY-10');
+    expect(mockGetTicketDetails).not.toHaveBeenCalledWith('DAISY-20');
+  });
+
+  it('falls back to PR body when title and head branch have no keys', async () => {
+    await runMain({
+      title: 'Generic title',
+      head: 'feature/no-ticket-in-branch',
+      body: 'Implements DAISY-42',
+    });
+
+    expect(mockGetTicketDetails).toHaveBeenCalledWith('DAISY-42');
+  });
+
   it('resolves PERMS-2 from INFRA-740-perms-2 when no issue-key-prefix is configured', async () => {
     await runMain({ head: 'INFRA-740-perms-2', title: 'Generic title' });
 
