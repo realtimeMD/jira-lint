@@ -130,7 +130,7 @@ async function run(): Promise<void> {
       ? primaryIssueKeys
       : secondaryIssueKeys.length
       ? secondaryIssueKeys
-      : getJIRAIssueKeys(prBody, ISSUE_KEY_PREFIX);
+      : getJIRAIssueKeys(prBody || '', ISSUE_KEY_PREFIX);
     console.log('Issue keys after check -> ', issueKeys);
     if (!issueKeys.length) {
       const comment: IssuesCreateCommentParams = {
