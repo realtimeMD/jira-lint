@@ -126,11 +126,11 @@ async function run(): Promise<void> {
     console.log('Title -> ', title);
     console.log('Primary issue keys from title -> ', primaryIssueKeys);
     const secondaryIssueKeys = getJIRAIssueKeys(headBranch, ISSUE_KEY_PREFIX);
-     const issueKeys = primaryIssueKeys.length
-       ? primaryIssueKeys
-       : secondaryIssueKeys.length
-         ? secondaryIssueKeys
-         : getJIRAIssueKeys(prBody, ISSUE_KEY_PREFIX);
+    const issueKeys = primaryIssueKeys.length
+      ? primaryIssueKeys
+      : secondaryIssueKeys.length
+      ? secondaryIssueKeys
+      : getJIRAIssueKeys(prBody, ISSUE_KEY_PREFIX);
     console.log('Issue keys after check -> ', issueKeys);
     if (!issueKeys.length) {
       const comment: IssuesCreateCommentParams = {
