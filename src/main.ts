@@ -123,7 +123,10 @@ async function run(): Promise<void> {
     // Prefer the PR title as the source of truth for the primary issue key.
     // Only use a key from the head branch name or PR body when the title has no matching key.
     const primaryIssueKeys = getJIRAIssueKeys(title, ISSUE_KEY_PREFIX);
+    console.log('Title -> ', title);
+    console.log('Primary issue keys from title -> ', primaryIssueKeys);
     const issueKeys = primaryIssueKeys.length ? primaryIssueKeys : getJIRAIssueKeys(`${headBranch} ${prBody}`, ISSUE_KEY_PREFIX);
+    console.log('Issue keys after fallback -> ', issueKeys);
     if (!issueKeys.length) {
       const comment: IssuesCreateCommentParams = {
         ...commonPayload,

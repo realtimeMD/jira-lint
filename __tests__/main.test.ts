@@ -140,4 +140,18 @@ describe('run() - JIRA key resolution', () => {
     expect(mockGetTicketDetails).toHaveBeenCalledWith('DAISY-42');
     expect(mockGetTicketDetails).not.toHaveBeenCalledWith('OTHER-999');
   });
+
+  it('resolves PERMS-2 from INFRA-740-perms-2 when no issue-key-prefix is configured', async () => {
+    await runMain({ head: 'INFRA-740-perms-2', title: 'Generic title' });
+
+    expect(mockGetTicketDetails).toHaveBeenCalledWith('PERMS-2');
+  });
+
+  it('resolves INFRA-740 from INFRA-740-perms-2 when issue-key-prefix is INFRA', async () => {
+    setupInputs({ 'issue-key-prefix': 'INFRA' });
+    await runMain({ head: 'INFRA-740-perms-2', title: 'Generic title' });
+
+    expect(mockGetTicketDetails).toHaveBeenCalledWith('INFRA-740');
+    expect(mockGetTicketDetails).not.toHaveBeenCalledWith('PERMS-2');
+  });
 });
