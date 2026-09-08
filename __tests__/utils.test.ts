@@ -131,6 +131,11 @@ describe('getJIRAIssueKeys()', () => {
     expect(getJIRAIssueKeys('DAISY-123 DAISY-456', 'DAISY')).toEqual(['DAISY-123', 'DAISY-456']);
     expect(getJIRAIssueKeys('OTHER-45', 'DAISY')).toEqual([]);
   });
+
+  it('handles branch names containing multiple ticket-like segments', () => {
+    expect(getJIRAIssueKeys('INFRA-740-perms-2')).toEqual(['INFRA-740', 'PERMS-2']);
+    expect(getJIRAIssueKeys('INFRA-740-perms-2', 'INFRA')).toEqual(['INFRA-740']);
+  });
 });
 
 describe('shouldUpdatePRDescription()', () => {
